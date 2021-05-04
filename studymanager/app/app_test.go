@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	_ "strings"
 	"studymanager/model"
 	"testing"
@@ -15,8 +16,11 @@ import (
 )
 
 func TestUsers(t *testing.T) {
+	os.Remove("./test.db") //DB를 지우고 시작
 	assert := assert.New(t)
-	ts := httptest.NewServer(MakeHandler())
+	ah := MakeHandler("./test.db")
+	defer ah.Close()
+	ts := httptest.NewServer(ah) //ah을 인자로 바로 써줄 수 있다
 	defer ts.Close()
 
 	resp, err := http.PostForm(ts.URL+"/users", url.Values{"name": {"jo"}, "email": {"jo@jo.com"}, "pass_word": {"abcd"}})

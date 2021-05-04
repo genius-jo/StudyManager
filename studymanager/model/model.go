@@ -13,23 +13,12 @@ type Register struct {
 	PassWord string `json:"pass_word"`
 }
 
-var userMap map[int]*User
-
-func init() {
-	userMap = make(map[int]*User)
+type UserDBHandler interface {
+	GetUsers() []*User
+	AddUser(register Register) *User
+	Close()
 }
 
-func GetUsers() []*User {
-	list := []*User{}
-	for _, v := range userMap {
-		list = append(list, v)
-	}
-	return list
-}
-
-func AddUser(register Register) *User {
-	id := len(userMap) + 1
-	user := &User{id, register.Name, register.Email, register.PassWord}
-	userMap[id] = user
-	return user
+func NewUserDBHandler(filepath string) UserDBHandler {
+	return newUserSqlHandler(filepath)
 }
