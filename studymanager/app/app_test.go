@@ -68,3 +68,21 @@ func TestUsers(t *testing.T) {
 	}
 
 }
+
+func TestLogin(t *testing.T) {
+	assert := assert.New(t)
+	ah := MakeHandler("./test.db")
+	defer ah.Close()
+	ts := httptest.NewServer(ah) //ah을 인자로 바로 써줄 수 있다
+	defer ts.Close()
+
+	resp, err := http.PostForm(ts.URL+"/login", url.Values{"email": {"jo@jo.com"}, "pass_word": {"abcd"}})
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+	var user model.User
+	err = json.NewDecoder(resp.Body).Decode(&user) //json값을 user로 읽음
+	assert.NoError(err)
+	assert.Equal(user.Name, "jo")
+	assert.Equal(user.Email, "jo@jo.com")
+	assert.Equal(user.PassWord, "abcd")
+}

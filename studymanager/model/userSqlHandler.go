@@ -27,10 +27,6 @@ func (ush *userSqlHandler) GetUsers() []*User {
 }
 
 func (ush *userSqlHandler) AddUser(register Register) *User {
-	//id := len(userMap) + 1
-	//user := &User{id, register.Name, register.Email, register.PassWord}
-	//userMap[id] = user
-	//return user
 	stmt, err := ush.db.Prepare("INSERT INTO users (name, email, pass_word) VALUES (?, ?, ?)")
 	if err != nil {
 		panic(err)
