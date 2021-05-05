@@ -1,32 +1,18 @@
-$(function() {
-  $(".btn").click(function() {
-    $(".form-signin").toggleClass("form-signin-left");
-    $(".form-signup").toggleClass("form-signup-left");
-    $(".frame").toggleClass("frame-long");
-    $(".signup-inactive").toggleClass("signup-active");
-    $(".signin-active").toggleClass("signin-inactive");
-    $(".forgot").toggleClass("forgot-left");
-    $(this).removeClass("idle").addClass("active");
-  });
-});
+  function userRegister() {
+    let nameRegisterInput = $('#nameRegister').val();
+    let emailRegisterInput = $('#emailRegister').val();
+    let passwordRegisterInput = $('#passwordRegister').val();
 
-$(function() {
-  $(".btn-signup").click(function() {
-    $(".nav").toggleClass("nav-up");
-    $(".form-signup-left").toggleClass("form-signup-down");
-    $(".success").toggleClass("success-left");
-    $(".frame").toggleClass("frame-short");
-  });
-});
+    let data = {'name': nameRegisterInput, 'email':emailRegisterInput, 'pass_word':passwordRegisterInput};
 
-$(function() {
-  $(".btn-signin").click(function() {
-    $(".btn-animate").toggleClass("btn-animate-grow");
-    $(".welcome").toggleClass("welcome-left");
-    $(".cover-photo").toggleClass("cover-photo-down");
-    $(".frame").toggleClass("frame-short");
-    $(".profile-photo").toggleClass("profile-photo-down");
-    $(".btn-goback").toggleClass("btn-goback-up");
-    $(".forgot").toggleClass("forgot-fade");
-  });
-});
+    $.ajax({
+        type: 'POST',
+        url: '/users',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (response) {
+            alert('회원가입이 완료 되었습니다.');
+        }
+    });
+
+}

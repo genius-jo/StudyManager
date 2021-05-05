@@ -96,7 +96,7 @@ func (ah *AppHandler) loginHandler(w http.ResponseWriter, r *http.Request) {
 func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 	//요청한 url이 로그인일때는 next로
-	if strings.Contains(r.URL.Path, "/login.html") || strings.Contains(r.URL.Path, "/login") {
+	if strings.Contains(r.URL.Path, "/login.html") || strings.Contains(r.URL.Path, "/login") || strings.Contains(r.URL.Path, "/users") {
 		next(w, r)
 		return
 	}
