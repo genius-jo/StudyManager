@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"strconv"
 	_ "strings"
 	"studymanager/model"
 	"testing"
@@ -85,4 +86,86 @@ func TestLogin(t *testing.T) {
 	assert.Equal(user.Name, "jo")
 	assert.Equal(user.Email, "jo@jo.com")
 	assert.Equal(user.PassWord, "abcd")
+}
+
+func TestTodos(t *testing.T) {
+	getSessionID = func(r *http.Request) string { //test할 세션을 미리 넣음
+		return "testsessionId"
+	}
+	os.Remove("./test.db")
+	assert := assert.New(t)
+	ah := MakeHandler("./test.db")
+	defer ah.Close()
+
+	ts := httptest.NewServer(ah)
+	defer ts.Close()
+
+	resp, err := http.PostForm(ts.URL+"/todos", url.Values{"name": {"Test todo"}})
+	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
+
+	var todo model.Todo
+	err = json.NewDecoder(resp.Body).Decode(&todo)
+	assert.NoError(err)
+	assert.Equal(todo.Name, "Test todo")
+
+	id1 := todo.Id
+	resp, err = http.PostForm(ts.URL+"/todos", url.Values{"name": {"Test todo2"}})
+	assert.NoError(err)
+	assert.Equal(http.StatusCreated, resp.StatusCode)
+	err = json.NewDecoder(resp.Body).Decode(&todo)
+	assert.NoError(err)
+	assert.Equal(todo.Name, "Test todo2")
+	id2 := todo.Id
+
+	resp, err = http.Get(ts.URL + "/todos")
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+	todos := []*model.Todo{}
+	err = json.NewDecoder(resp.Body).Decode(&todos)
+	assert.NoError(err)
+	assert.Equal(2, len(todos))
+	for _, t := range todos {
+		if t.Id == id1 {
+			assert.Equal("Test todo", t.Name)
+		} else if t.Id == id2 {
+			assert.Equal("Test todo2", t.Name)
+		} else {
+			assert.Error(fmt.Errorf("testId error"))
+		}
+	}
+
+	resp, err = http.Get(ts.URL + "/complete-todo/" + strconv.Itoa(id1) + "?complete=true")
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+	resp, err = http.Get(ts.URL + "/todos")
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+	todos = []*model.Todo{}
+	err = json.NewDecoder(resp.Body).Decode(&todos)
+	assert.NoError(err)
+	assert.Equal(2, len(todos))
+	for _, t := range todos {
+		if t.Id == id1 {
+			assert.True(t.Completed)
+		}
+	}
+
+	req, _ := http.NewRequest("DELETE", ts.URL+"/todos/"+strconv.Itoa(id1), nil) //delete는 이런식으로 해줘야 한다
+	resp, err = http.DefaultClient.Do(req)
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	resp, err = http.Get(ts.URL + "/todos")
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, resp.StatusCode)
+
+	todos = []*model.Todo{}
+	err = json.NewDecoder(resp.Body).Decode(&todos)
+	assert.NoError(err)
+	assert.Equal(len(todos), 1)
+	for _, t := range todos {
+		assert.Equal(t.Id, id2)
+	}
+
 }

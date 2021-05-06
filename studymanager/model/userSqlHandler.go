@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -31,6 +32,11 @@ func (ush *userSqlHandler) AddUser(register Register) *User {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Println(register.Name)
+	log.Println(register.Email)
+	log.Println(register.PassWord)
+
 	rst, err := stmt.Exec(register.Name, register.Email, register.PassWord) //(?,?,?)에 대응하는것
 	if err != nil {
 		panic(err)
