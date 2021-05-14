@@ -50,11 +50,28 @@ var getSessionID = func(r *http.Request) string {
 
 	val := session.Values["id"]
 
+	log.Println("---sessionID---")
+	log.Println(val)
+	log.Println("---sessionID---")
+
 	if val == nil { //로그인이 안 되어 있을때
+		log.Println("ID nil")
 		return ""
 	}
 
-	return "12" //val.(string)
+	ret := val.(int)
+
+	log.Println("---sessionID int---")
+	log.Println(ret)
+	log.Println("---sessionID int---")
+
+	sret := strconv.Itoa(ret)
+
+	log.Println("---sessionID string---")
+	log.Println(sret)
+	log.Println("---sessionID string---")
+
+	return sret //"12" //val.(string)
 }
 
 func (ah *AppHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -115,9 +132,9 @@ func (ah *AppHandler) loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("redirect")
+		//log.Println("redirect")
 		//todo로 리다이렉트
-		http.Redirect(w, r, "/todo", 301)
+		//http.Redirect(w, r, "/todo", 301)
 
 	} else {
 		errMsg := fmt.Sprintf("invalid login info")
