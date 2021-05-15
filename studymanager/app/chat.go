@@ -2,7 +2,8 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
+	_ "fmt"
+	_ "log"
 	"net/http"
 	"strconv"
 	"studymanager/model"
@@ -35,20 +36,6 @@ func (ah *AppHandler) indexChatHandler(w http.ResponseWriter, r *http.Request) {
 
 func (ah *AppHandler) messageHandler(w http.ResponseWriter, r *http.Request) {
 	msg := r.FormValue("msg")
-	name := r.FormValue("name")
+	name := getSessionName(r)
 	sendMessage(name, msg)
-}
-
-func (ah *AppHandler) addNameHandler(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("name")
-
-	//해당 유저가 들어왔다는거을 알림 (모든 유저들에게 메세지를 보냄)
-	sendMessage("", fmt.Sprintf("add user: %s", username))
-}
-
-func (ah *AppHandler) leftUserHandler(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-
-	//해당 유저가 나갔다는것을 알림
-	sendMessage("", fmt.Sprintf("left user: %s", username))
 }

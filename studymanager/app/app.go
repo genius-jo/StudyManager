@@ -69,8 +69,8 @@ func MakeHandler(filepath string) *AppHandler {
 	router.HandleFunc("/chat", ah.indexChatHandler).Methods("GET")
 	router.HandleFunc("/messages", ah.messageHandler).Methods("POST")
 	router.Handle("/stream", Es) //클라이언트가 /stream으로 요청할때 커넥트를 맺는다
-	router.HandleFunc("/user", ah.addNameHandler)
-	router.HandleFunc("/user", ah.leftUserHandler).Methods("DELETE")
+	//router.HandleFunc("/user", ah.addNameHandler)
+	//router.HandleFunc("/user", ah.leftUserHandler).Methods("DELETE")
 
 	return ah
 }
