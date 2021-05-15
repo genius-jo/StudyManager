@@ -29,6 +29,11 @@ type Todo struct {
 	Created   time.Time `json:"created_at"`
 }
 
+type Message struct {
+	Name string `json:"name"`
+	Msg  string `json:"msg"`
+}
+
 type UserDBHandler interface {
 	GetUsers() []*User
 	AddUser(register Register) *User

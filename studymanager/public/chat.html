@@ -1,0 +1,42 @@
+<html>
+
+<head>
+  <title>EventSource Chatting program</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="chat.js"></script>
+    
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css">
+  <link rel="stylesheet" href="todo.css">
+</head>
+
+<body>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/todo" data-abc="true">StudyManager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02"
+          aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor02">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item"> <a class="nav-link" href="/todo" data-abc="true">Todo</a> </li>
+            <li class="nav-item"> <a class="nav-link" href="/chat" data-abc="true">chatting</a> </li>
+            <li class="nav-item"> <a class="nav-link" href="/logout" data-abc="true">Logout</a> </li>
+          </ul>
+        </div>
+      </nav>
+  <div id="chat-log"></div>
+  <div id="user-name"></div>
+  <form id="input-form">
+    <input type="text" id="chat-msg" size="64" autofocus />
+    <input type="submit" value="Send" />
+  </form>
+</body>
+
+</html>

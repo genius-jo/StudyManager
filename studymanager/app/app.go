@@ -1,6 +1,7 @@
 package app
 
 import (
+	_ "encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,7 +9,9 @@ import (
 	"strconv"
 	"strings"
 	"studymanager/model"
+	_ "time"
 
+	_ "github.com/antage/eventsource"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/unrolled/render"
@@ -230,8 +233,64 @@ func (ah *AppHandler) completeTodoHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func (ah *AppHandler) messageHandler(w http.ResponseWriter, r *http.Request) {
+	msg := r.FormValue("msg")
+	name := r.FormValue("name")
+	log.Println("---chat---name, msg---")
+	log.Println(name)
+	log.Println(msg)
+	log.Println("---chat---name, msg---")
+	sendMessage(name, msg)
+}
+
+func (ah *AppHandler) addNameHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("name")
+
+	//해당 유저가 들어왔다는거을 알림 (모든 유저들에게 메세지를 보냄)
+	sendMessage("", fmt.Sprintf("add user: %s", username))
+}
+
+func (ah *AppHandler) leftUserHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+
+	//해당 유저가 나갔다는것을 알림
+	sendMessage("", fmt.Sprintf("left user: %s", username))
+}
+
+/*
+type Message struct {
+	Name string `json:"name"`
+	Msg  string `json:"msg"`
+}*/
+
+//var msgCh chan Message //메세지를 넣는 채널
+
+/*
+//모든 클라이언트에게 메세지를 보냄
+func sendMessage(name, msg string) {
+
+	//다른 스레드에 큐 형태로 보냄
+	main.msgCh <- model.Message{name, msg}
+}
+
+//채널에서 pop해서 이벤트 소스로 보냄
+func processMsgCh(es eventsource.EventSource) {
+	for msg := range main.msgCh {
+		data, _ := json.Marshal(msg)
+		es.SendEventMessage(string(data), "", strconv.Itoa(time.Now().Nanosecond())) //유니크한 ID는 현재시간으로
+	}
+}
+*/
+
+func (ah *AppHandler) indexChatHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("here chat")
+	log.Println(r.Method)
+	http.Redirect(w, r, "/chat.html", http.StatusTemporaryRedirect)
+}
+
 func MakeHandler(filepath string) *AppHandler {
 
+	//msgCh = make(chan Message)
 	router := mux.NewRouter()
 	n := negroni.New(negroni.NewRecovery(), negroni.NewLogger() /*negroni.HandlerFunc(CheckSignin),*/, negroni.NewStatic(http.Dir("public"))) //미들웨어 추가, 미들웨어는 체인 형식
 
@@ -243,6 +302,9 @@ func MakeHandler(filepath string) *AppHandler {
 		db2:     model.NewLoginDBHandler(filepath),
 		db3:     model.NewTodoDBHandler(filepath),
 	}
+
+	//es := eventsource.New(nil, nil)
+	//defer es.Close()
 
 	router.HandleFunc("/users", ah.getUserListHandler).Methods("GET")
 	router.HandleFunc("/users", ah.addUserHandler).Methods("POST")
@@ -256,6 +318,15 @@ func MakeHandler(filepath string) *AppHandler {
 	router.HandleFunc("/todos", ah.addTodoHandler).Methods("POST")
 	router.HandleFunc("/todos/{id:[0-9]+}", ah.removeTodoHandler).Methods("DELETE")
 	router.HandleFunc("/complete-todo/{id:[0-9]+}", ah.completeTodoHandler).Methods("GET")
+
+	router.HandleFunc("/chat", ah.indexChatHandler).Methods("GET")
+	router.HandleFunc("/messages", ah.messageHandler).Methods("POST")
+	router.Handle("/stream", Es) //클라이언트가 /stream으로 요청할때 커넥트를 맺는다
+	router.HandleFunc("/user", ah.addNameHandler)
+	router.HandleFunc("/user", ah.leftUserHandler).Methods("DELETE")
+
+	//메세지 채널을 고 쓰레드로 실행
+	//go processMsgCh(es)
 
 	return ah
 }
