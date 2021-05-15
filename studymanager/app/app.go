@@ -145,6 +145,30 @@ func (ah *AppHandler) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (ah *AppHandler) logoutHandler(w http.ResponseWriter, r *http.Request) {
+
+	session, err := store.Get(r, "session") //세션을 가져온다
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//세션 초기화
+	session.Values["id"] = nil
+	session.Values["name"] = nil
+
+	err = session.Save(r, w) //쿠키에 저장
+	if err != nil {
+		log.Println("session error")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//로그인화면으로 리다이렉트
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+
+}
+
 func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 	//요청한 url이 로그인일때는 next로
@@ -225,6 +249,7 @@ func MakeHandler(filepath string) *AppHandler {
 	router.HandleFunc("/", ah.indexHandler)
 
 	router.HandleFunc("/login", ah.loginHandler) //.Methods("POST")
+	router.HandleFunc("/logout", ah.logoutHandler)
 
 	router.HandleFunc("/todo", ah.indexTodoHandler).Methods("GET")
 	router.HandleFunc("/todos", ah.getTodoListHandler).Methods("GET")
