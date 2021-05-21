@@ -39,7 +39,7 @@ func MakeHandler(filepath string) *AppHandler {
 
 	router := mux.NewRouter()
 
-	n := negroni.New(negroni.NewRecovery(), negroni.NewLogger() /*negroni.HandlerFunc(CheckSignin),*/, negroni.NewStatic(http.Dir("public"))) //미들웨어 추가, 미들웨어는 체인 형식
+	n := negroni.New(negroni.NewRecovery(), negroni.NewLogger(), negroni.HandlerFunc(CheckSignin), negroni.NewStatic(http.Dir("public"))) //미들웨어 추가, 미들웨어는 체인 형식
 	n.UseHandler(router)
 
 	ah := &AppHandler{
@@ -52,7 +52,7 @@ func MakeHandler(filepath string) *AppHandler {
 	//users관련
 	router.HandleFunc("/users", ah.getUserListHandler).Methods("GET")
 	router.HandleFunc("/users", ah.addUserHandler).Methods("POST")
-	router.HandleFunc("/", ah.indexHandler)
+	router.HandleFunc("/home", ah.indexHandler)
 
 	//login관련
 	router.HandleFunc("/login", ah.loginHandler) //.Methods("POST")

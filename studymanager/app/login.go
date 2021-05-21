@@ -64,6 +64,6 @@ func (ah *AppHandler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//로그인화면으로 리다이렉트
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/home", http.StatusTemporaryRedirect)
 
 }

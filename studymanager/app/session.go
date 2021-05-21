@@ -54,7 +54,7 @@ func getSessionName(r *http.Request) string {
 func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 	//요청한 url이 로그인일때는 next로
-	if strings.Contains(r.URL.Path, "/login") || strings.Contains(r.URL.Path, "/users") {
+	if strings.Contains(r.URL.Path, "/login") || strings.Contains(r.URL.Path, "/logout") || strings.Contains(r.URL.Path, "/users") || strings.Contains(r.URL.Path, "/home") {
 		next(w, r)
 		return
 	}
@@ -67,5 +67,5 @@ func CheckSignin(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 	}
 
 	//로그인이 되어 있지 않을때 로그인 화면으로 리다이렉트
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/home", http.StatusTemporaryRedirect)
 }
